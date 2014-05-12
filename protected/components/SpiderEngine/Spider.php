@@ -78,7 +78,6 @@ class Spider{
 			}
 			$pages = $newPages;
 		}
-		return;
 	}
 
 }
