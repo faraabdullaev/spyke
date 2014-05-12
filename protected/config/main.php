@@ -7,7 +7,8 @@ return array(
 	'preload'=>array('debug'),
 
 	'import'=>array(
-		'application.models.*',
+		'application.models.db.*',
+		'application.models.form.*',
 		'application.components.*',
 	),
 

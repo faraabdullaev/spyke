@@ -8,6 +8,12 @@ $config =  array(
 
 	'preload'=>array('debug'),
 
+	'import'=>array(
+		'application.models.db.*',
+		'application.components.SpiderEngine.*',
+		'application.components.*',
+	),
+
 	'components'=>array(
 		'log'=>array(
 			'class'=>'CLogRouter',
