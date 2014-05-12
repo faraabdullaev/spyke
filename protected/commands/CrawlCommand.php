@@ -3,7 +3,14 @@
 class CrawlCommand extends CConsoleCommand{
 
 	public function run($args){
-		$spider = new Spider();
+		$pages = [
+			'http://messaki.dev/',
+			'http://wc.dev/',
+		];
+
+		$spider = Spider::getInstance();
+
+		$spider->run( $pages );
 	}
 
 } 
