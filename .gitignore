@@ -1,0 +1,13 @@
+# IDE
+.idea/*
+
+
+# Project
+public/assets/*
+
+
+
+vendor/*
+protected/runtime/*
+protected/config/private.php
+composer.phar
