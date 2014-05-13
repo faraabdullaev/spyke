@@ -69,13 +69,21 @@ class Spider{
 				preg_match_all("/<[Aa][\s]{1}[^>]*[Hh][Rr][Ee][Ff][^=]*=[ '\"\s]*([^ \"'>\s#]+)[^>]*>/", $content, $matches);
 				$links = $matches[1];
 				foreach( $links as $link ){
-					if( strpos($link, 'http')!=null && !$this->isIndexed($link) ){
+					/** clip all text after # */
+					if( strpos($link, '#') != null )
+						$link = substr($link, 0, strpos($link, '#') );
+					/** if link is local */
+					if( strpos($link, '/') == 0 )
+						$link = $page . $link ;
+
+					if( strpos($link, 'http')!=null && !$this->isIndexed($link) )
 						$newPages[] = $link;
-					}
+
 					$linkText = $this->getTextOnly($link);
 					$this->addLinkRef($page, $link, $linkText);
 				}
 			}
+			echo $this->br;
 			$pages = $newPages;
 		}
 	}
