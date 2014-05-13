@@ -1,3 +1,3 @@
 <?php
 
-return ['fuck', 'ass', 'bitch', 'juline'];
+return [ '', 'fuck', 'ass', 'bitch', 'juline'];
