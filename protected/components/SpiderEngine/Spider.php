@@ -91,6 +91,11 @@ class Spider{
 	/** separate text to words */
 	function separateWords($text){
 		$words = preg_split("/\W/", $text, -1, PREG_SPLIT_NO_EMPTY);
+		$words = array_map('strtolower', $words);
+		foreach($words as $word){
+			if(mb_detect_encoding($word) == 'UTF-8')
+				$word = mb_convert_encoding($word, 'ASCII');
+		}
 		return array_map('strtolower', $words);
 	}
 
