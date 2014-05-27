@@ -1,7 +1,6 @@
 <?php
 
 Yii::import('application.components.SpiderEngine.*');
-Yii::import('application.components.SpiderEngine.htmlParser.*');
 
 class Spider{
 
@@ -67,8 +66,14 @@ class Spider{
 
 	/** clear HTML text */
 	function getTextOnly($url){
-		$response = get_headers($url);
-		if( strpos($response[0], '200') == null ){
+		echo $url . $this->br;
+		try{
+			$response = get_headers($url);
+			if( strpos($response[0], '200') == null ){
+				echo 'Can\'t open : ' . $url . $this->br;
+				return;
+			}
+		} catch(Exception $ex){
 			echo 'Can\'t open : ' . $url . $this->br;
 			return;
 		}
@@ -90,13 +95,13 @@ class Spider{
 
 	/** separate text to words */
 	function separateWords($text){
+		$text = iconv('utf-8', 'windows-1251', $text);
 		$words = preg_split("/\W/", $text, -1, PREG_SPLIT_NO_EMPTY);
-		$words = array_map('strtolower', $words);
+		$new = [];
 		foreach($words as $word){
-			if(mb_detect_encoding($word) == 'UTF-8')
-				$word = mb_convert_encoding($word, 'ASCII');
+			$new[] = iconv('windows-1251', 'utf-8', strtolower($word));
 		}
-		return array_map('strtolower', $words);
+		return $new;
 	}
 
 	/** if this URL in index return TRUE */
