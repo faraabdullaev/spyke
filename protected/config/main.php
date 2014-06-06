@@ -10,6 +10,8 @@ return array(
 		'application.models.db.*',
 		'application.models.form.*',
 		'application.components.*',
+		'application.components.Archer.*',
+		'application.components.SpiderEngine.*',
 	),
 
 	'modules'=>array(
