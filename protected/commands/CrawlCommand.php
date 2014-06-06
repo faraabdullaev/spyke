@@ -12,7 +12,7 @@ class CrawlCommand extends CConsoleCommand{
 
 		$spider = Spider::getInstance();
 
-		$spider->run( $pages );
+		$spider->run( $pages, 2 );
 	}
 
 } 

@@ -59,25 +59,25 @@ class Spider{
 			$model->location = $i;
 			$model->urlId = $urlId;
 			$model->wordId = $wodrId;
-			if($model->save())
-				$i++;
+			if($model->save()) $i++;
 		}
 	}
 
 	/** clear HTML text */
 	function getTextOnly($url){
 		echo $url . $this->br;
+
 		try{
-			$response = get_headers($url);
-			if( strpos($response[0], '200') == null ){
+			$content = $this->isDomainAvailible($url, false);
+			if( !$content ){
 				echo 'Can\'t open : ' . $url . $this->br;
 				return;
 			}
-		} catch(Exception $ex){
-			echo 'Can\'t open : ' . $url . $this->br;
+		}
+		catch( Exception $ex ){
+			echo 'Can\'t open page' .$this->br;
 			return;
 		}
-		$content = file_get_contents($url);
 
 		/** remove style */
 		$content = preg_replace("/(<style).*style>/sU", "", $content);
@@ -127,7 +127,11 @@ class Spider{
 			$newPages = [];
 			foreach($pages as $page){
 				try{
-					$content = file_get_contents($page);
+					$content = $this->isDomainAvailible($page, false);
+					if( !$content ){
+						echo 'Can\'t open : ' . $page . $this->br;
+						continue;
+					}
 				}
 				catch( Exception $ex ){
 					echo 'Can\'t open page' .$this->br;
@@ -153,6 +157,28 @@ class Spider{
 			}
 			$pages = $newPages;
 		}
+		echo 'Ending..';
 	}
+
+	function isDomainAvailible($url, $headerOnly = true){
+		if(!filter_var($url, FILTER_VALIDATE_URL)) return false;
+
+		$curlInit = curl_init($url);
+		curl_setopt($curlInit,CURLOPT_CONNECTTIMEOUT,10);
+		curl_setopt($curlInit,CURLOPT_HEADER,true);
+		curl_setopt($curlInit,CURLOPT_RETURNTRANSFER,true);
+
+		if($headerOnly)
+			curl_setopt($curlInit,CURLOPT_NOBODY,true);
+
+		$response = curl_exec($curlInit);
+
+		curl_close($curlInit);
+
+		if ($response) return $response;
+
+		return false;
+	}
+
 
 }
