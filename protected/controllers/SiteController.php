@@ -15,10 +15,23 @@ class SiteController extends Controller {
 	}
 
 	public function actionIndex(){
-		$q = 'Бесплатные игры онлайн';
-		$searcher = new Searcher();
-		$searcher->getMatchRows($q);
-		//$this->render('index');
+		$model = new QueryForm;
+
+		if( isset($_POST['QueryForm']) ){
+			$model->attributes = $_POST['QueryForm'];
+			$searcher = new Searcher();
+			$result = $searcher->Query( $model->query );
+
+			/*
+			foreach( $result['positions'] as $position ){
+				var_dump($position);
+				echo '<br>';
+			}
+			*/
+		}
+
+		//$q = 'Бесплатные игры онлайн';
+		$this->render('index', ['model'=>$model]);
 	}
 
 	/**

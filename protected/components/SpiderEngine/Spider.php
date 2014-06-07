@@ -65,8 +65,6 @@ class Spider{
 
 	/** clear HTML text */
 	function getTextOnly($url){
-		echo $url . $this->br;
-
 		try{
 			$content = $this->isDomainAvailible($url, false);
 			if( !$content ){
@@ -95,7 +93,7 @@ class Spider{
 
 	/** separate text to words */
 	function separateWords($text){
-		$text = iconv('utf-8', 'windows-1251', $text);
+		$text = iconv('utf-8', 'windows-1251//IGNORE', $text);
 		$words = preg_split("/\W/", $text, -1, PREG_SPLIT_NO_EMPTY);
 		$new = [];
 		foreach($words as $word){
@@ -151,7 +149,7 @@ class Spider{
 					if( strpos($link, 'http')!=null && !$this->isIndexed($link) )
 						$newPages[] = $link;
 
-					$linkText = $this->getTextOnly($link);
+					$linkText = $this->addToIndex($link);
 					$this->addLinkRef($page, $link, $linkText);
 				}
 			}
