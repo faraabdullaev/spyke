@@ -1,7 +1,8 @@
 <?php
 
 //error_reporting(0);
-defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL', 3);
+defined('YII_DEBUG') or define('YII_DEBUG',true);
+defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL',3);
 
 $yii    = dirname(__FILE__) . '/../vendor/yiisoft/yii/framework/yii.php';
 $vendor = dirname(__FILE__) . '/../vendor/autoload.php';

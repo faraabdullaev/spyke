@@ -37,7 +37,7 @@ class Searcher {
 		}
 		$fullQuery = sprintf('SELECT %s FROM %s WHERE %s', $fieldList, $tableList, $clauseList);
 		$command = Yii::app()->db->createCommand($fullQuery);
-		$positions = $command->query();
+		$positions = $command->queryAll();
 
 		$result = [
 			'positions'	=> $positions,
@@ -47,14 +47,20 @@ class Searcher {
 		return $result;
 	}
 
+	private function getUrlName($id){
+		$model = UrlList::model()->findByPk($id);
+		if( $model )
+			return $model->url;
+		return false;
+	}
+
 	private function getScoredList($rows, $wordIds){
 		$totalScores = [];
+		foreach($rows as $row){
+			$totalScores[] = [$row['urlId'], 0];
+		}
 		/** TODO::Сюда функцию ранжирования */
 		$weights = [];
-
-		foreach($rows as $row){
-			$totalScores[] = [$row, 0];
-		}
 		foreach($weights as $weight => $scores){
 			foreach($totalScores as $url){
 				$totalScores['url'] .= $weight*$scores['url'];
@@ -63,22 +69,35 @@ class Searcher {
 		return $totalScores;
 	}
 
-	private function getUrlName($id){
-		$model = UrlList::model()->findByPk($id);
-		if( $model )
-			return $model->url;
-		return false;
-	}
-
 	function Query($q){
 		$result = $this->getMatchRows($q);
 		$rows = $result['positions'];
 		$wordList = $result['wordList'];
 
 		$scores = $this->getScoredList($rows, $wordList);
-		var_dump($scores);
-		//$rankedScores =
+		for($i=0; $i<count($scores); $i++){
+			$scores[$i][0] = $this->getUrlName($scores[$i][0]);
+		}
+
+		$rankedScores = [];
+		foreach($scores as $score){
+			$rankedScores[] = [
+					'scores'=> $score[1],
+					'url'	=> $score[0]
+				];
+		}
 
 	}
 
+	private function normalize($scores, $smallIsBetter = true){
+		$vsmall = 0.0001;
+		if( $smallIsBetter ){
+
+		}
+	}
+
+	private function frequency($rows){
+		$count = 1;
+		return $this->normalize();
+	}
 }
