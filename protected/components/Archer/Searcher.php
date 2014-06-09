@@ -56,17 +56,14 @@ class Searcher {
 
 	private function getScoredList($rows, $wordIds){
 		$totalScores = [];
-		foreach($rows as $row){
-			$totalScores[] = [$row['urlId'], 0];
-		}
+
 		/** TODO::Сюда функцию ранжирования */
 		$weights = $this->locationScore($rows);
+		//$weights = $this->frequencyScore($rows);
 
-		foreach($weights as $weight => $scores){
-			for($i = 0; $i<count($totalScores); $i++){
-				$totalScores[$i] = $scores;
-			}
-		}
+		foreach($weights as $weight => $scores)
+			$totalScores[] = [ $weight, $scores ];
+
 		return $totalScores;
 	}
 
@@ -77,7 +74,7 @@ class Searcher {
 
 		$scores = $this->getScoredList($rows, $wordList);
 		for($i=0; $i<count($scores); $i++){
-			$scores[$i][0] = $this->getUrlName($scores[$i][0]);
+			$scores[$i][0] = $this->getUrlName($scores[$i][1][0]);
 		}
 
 		$rankedScores = [];
@@ -87,7 +84,11 @@ class Searcher {
 					'url'	=> $score[0]
 				];
 		}
-		$this->frequencyScore($rows);
+
+		foreach( $rankedScores as $position ){
+			var_dump( $position ); echo '<br>';
+		}
+
 	}
 
 	private function normalize($rows, $smallIsBetter = true){
@@ -116,14 +117,25 @@ class Searcher {
 	}
 
 	private function frequencyScore($rows){
-		$count = 0;
+		$count = 1;
 		$i = 0;
 		$counts = [];
+		$lastUrl = '';
 		foreach($rows as $row){
-
+			if($lastUrl == $row['urlId']){
+				$count++;
+				$counts[$i-1][1] = $count;
+			} else {
+				$counts[$i] = [
+					$row['urlId'],
+					$count
+				];
+				$i++;
+				$count = 1;
+			}
+			$lastUrl = $row['urlId'];
 		}
-		var_dump($counts); echo '<br>';
-		//return $this->normalize();
+		return $this->normalize($counts);
 	}
 
 	private function locationScore($rows){
