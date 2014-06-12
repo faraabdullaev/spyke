@@ -57,8 +57,12 @@ class Searcher {
 	private function getScoredList($rows, $wordIds){
 		$totalScores = [];
 
-		/** TODO::Сюда функцию ранжирования */
-		$weights = $this->locationScore($rows);
+		/** FIXED::Сюда функцию ранжирования */
+		if( count($wordIds) >= 2 )
+			$weights = $this->distanceScore($rows);
+		else
+			$weights = $this->locationScore($rows);
+		/** Метрика по частоте дает самый плохой результат */
 		//$weights = $this->frequencyScore($rows);
 
 		foreach($weights as $weight => $scores)
@@ -149,6 +153,27 @@ class Searcher {
 			$i++;
 		}
 		return $this->normalize($locations);
+	}
+
+	private function distanceScore($rows){
+		$minDist = [];
+		$j = 0;
+		foreach($rows as $row){
+			$minDist[] = [$row['urlId'], 1000000];
+			$dist = [];
+			$sum = 0;
+			foreach($row as $key => $val){
+				if($key == 'urlId') continue;
+				$dist[] = $val;
+			}
+			for($i=1; $i<count($dist);$i++){
+				$sum += abs($dist[$i] - $dist[$i-1]);
+			}
+			if( $sum < $minDist[$j][1] )
+				$minDist[$j][1] = $sum;
+			$j++;
+		}
+		return $this->normalize($minDist);
 	}
 
 	private function getScoresValues($rows){
