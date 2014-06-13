@@ -23,13 +23,10 @@ class Link extends CActiveRecord
 	 */
 	public function rules()
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
 		return array(
 			array('fromId, toId', 'required'),
 			array('fromId, toId', 'numerical', 'integerOnly'=>true),
-			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
+			array('fromId;toId', 'gunique'),
 			array('id, fromId, toId', 'safe', 'on'=>'search'),
 		);
 	}
@@ -93,5 +90,27 @@ class Link extends CActiveRecord
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
+	}
+
+	/**
+	 * Проверяет атрибуты модели на уникальность
+	 */
+	public function gunique($attribute)
+	{
+		$propnames = preg_split('/;/', $attribute);
+		$search    = array();
+		foreach ($propnames as $name) {
+			if (isset($this->$name)) {
+				$search[$name] = $this->$name;
+			}
+		}
+
+		$class = get_class($this);
+		$count = $class::model()->countByAttributes($search);
+
+		if ($count > ($this->isNewRecord ? 0 : 1)) {
+			$this->addError($attribute, implode($propnames, ', ') . " не уникальны");
+		}
+
 	}
 }

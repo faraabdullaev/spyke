@@ -40,7 +40,7 @@ class Spider{
 
 	/** add one page to index */
 	function addToIndex($url){
-		if( $this->isIndexed($url) ) return;
+		if( $this->isIndexed($url) ) return false;
 		echo 'Indexing... ' . $url .$this->br;
 
 		/** get words list */
@@ -61,6 +61,7 @@ class Spider{
 			$model->wordId = $wodrId;
 			if($model->save()) $i++;
 		}
+		return $urlId;
 	}
 
 	/** clear HTML text */
@@ -116,8 +117,11 @@ class Spider{
 	}
 
 	/** all URL from one page to other */
-	function addLinkRef($from, $to, $text){
-		return;
+	function addLinkRef($from, $to){
+		$model = new Link;
+		$model->fromId = $from;
+		$model->toId = $to;
+		return $model->save();
 	}
 
 	function run( $pages, $depth=2 ){
@@ -135,7 +139,7 @@ class Spider{
 					echo 'Can\'t open page' .$this->br;
 					continue;
 				}
-				$this->addToIndex($page);
+				$fromUrl = $this->addToIndex($page);
 				preg_match_all("/<[Aa][\s]{1}[^>]*[Hh][Rr][Ee][Ff][^=]*=[ '\"\s]*([^ \"'>\s#]+)[^>]*>/", $content, $matches);
 				$links = $matches[1];
 				foreach( $links as $link ){
@@ -149,8 +153,9 @@ class Spider{
 					if( strpos($link, 'http')!=null && !$this->isIndexed($link) )
 						$newPages[] = $link;
 
-					$linkText = $this->addToIndex($link);
-					$this->addLinkRef($page, $link, $linkText);
+					$toUrl = $this->addToIndex($link);
+					if( $toUrl )
+						$this->addLinkRef($fromUrl, $toUrl);
 				}
 			}
 			$pages = $newPages;
