@@ -183,5 +183,31 @@ class Spider{
 		return false;
 	}
 
-
+	function calculatePageRank($iterations = 20){
+		PageRank::model()->deleteAll('1');
+		$urlList = UrlList::model()->findAll();
+		foreach($urlList as $item){
+			$model = new PageRank;
+			$model->urlId = $item->id;
+			$model->score = 1;
+			$model->save();
+		}
+		echo 'Start iteration'.$this->br;
+		$db =  Yii::app()->db;
+		for($i=1; $i<=$iterations; $i++){
+			echo '#'.$i.$this->br;
+			foreach($urlList as $item){
+				$pr = 0.15;
+				$links = Link::model()->findAllByAttributes(['toId'=>$item->id]);
+				foreach($links as $link){
+					$linkPR = PageRank::model()->findByAttributes(['urlId'=>$link->fromId]);
+					if(!$linkPR) continue;
+					$linkPR = $linkPR->score;
+					$linkCounts = Link::model()->countByAttributes(['fromId'=>$link->fromId]);
+					$pr += 0.85*($linkPR/$linkCounts);
+				}
+				$db->createCommand()->update('{{page_rank}}', array('score'=>$pr), 'urlId = :urlId', array(':urlId'=>$item->id));
+			}
+		}
+	}
 }
