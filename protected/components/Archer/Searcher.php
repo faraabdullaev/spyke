@@ -84,7 +84,7 @@ class Searcher {
 		$rankedScores = [];
 		foreach($scores as $score){
 			$rankedScores[] = [
-					'scores'=> $score[1],
+					'score'=> $score[1][1],
 					'url'	=> $score[0]
 				];
 		}
