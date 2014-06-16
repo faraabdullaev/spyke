@@ -35,7 +35,7 @@ class Searcher {
 				$tableNumber++;
 			}
 		}
-		$fullQuery = sprintf('SELECT %s FROM %s WHERE %s', $fieldList, $tableList, $clauseList);
+		$fullQuery = sprintf('SELECT %s FROM %s WHERE %s GROUP BY w0.urlId', $fieldList, $tableList, $clauseList);
 		$command = Yii::app()->db->createCommand($fullQuery);
 		$positions = $command->queryAll();
 
@@ -57,7 +57,7 @@ class Searcher {
 	private function getScoredList($rows, $wordIds){
 		$totalScores = [];
 
-		/** FIXED::Сюда функцию ранжирования */
+		/** FIXED::Сюда функцию ранжирования*/
 		if( count($wordIds) >= 2 )
 			$weights = $this->distanceScore($rows);
 		else
@@ -174,6 +174,15 @@ class Searcher {
 			$j++;
 		}
 		return $this->normalize($minDist);
+	}
+
+	private function pagerankScore($rows){
+		$pageranks = [];
+		foreach($rows as $row){
+			$item = PageRank::model()->findByAttributes(['urlId'=>$row['urlId']]);
+			$pageranks[] = [ $row['urlId'], $item->score ];
+		}
+		return $this->normalize($pageranks);
 	}
 
 	private function getScoresValues($rows){

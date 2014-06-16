@@ -143,6 +143,9 @@ class Spider{
 				preg_match_all("/<[Aa][\s]{1}[^>]*[Hh][Rr][Ee][Ff][^=]*=[ '\"\s]*([^ \"'>\s#]+)[^>]*>/", $content, $matches);
 				$links = $matches[1];
 				foreach( $links as $link ){
+					/** if link is homepage */
+					if( $link == '/' || $link == './' ) continue;
+
 					/** clip all text after # */
 					if( strpos($link, '#') != null )
 						$link = substr($link, 0, strpos($link, '#') );
