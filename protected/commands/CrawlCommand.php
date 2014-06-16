@@ -2,7 +2,7 @@
 
 class CrawlCommand extends CConsoleCommand{
 
-	public function run($args){
+	public function actionRun(){
 		$pages = [
 			'http://messaki.dev',
 			'http://armorgames.dev',
@@ -15,4 +15,9 @@ class CrawlCommand extends CConsoleCommand{
 		$spider->run( $pages, 2 );
 	}
 
-} 
+	public function actionPagerank(){
+		$spider = Spider::getInstance();
+
+		$spider->calculatePageRank();
+	}
+}

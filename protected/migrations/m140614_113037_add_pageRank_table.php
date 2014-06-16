@@ -7,7 +7,7 @@ class m140614_113037_add_pageRank_table extends CDbMigration{
 			[
 				'Id' => 'pk',
 				'urlId' => 'integer(10) NOT NULL',
-				'score' => 'integer(10) NOT NULL DEFAULT 0'
+				'score' => 'float(10) NOT NULL DEFAULT 0.85'
 			]
 		);
 	}

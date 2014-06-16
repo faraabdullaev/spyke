@@ -184,7 +184,10 @@ class Spider{
 	}
 
 	function calculatePageRank($iterations = 20){
+		echo 'Remove old records'.$this->br;
 		PageRank::model()->deleteAll('1');
+
+		echo 'Make clones'.$this->br;
 		$urlList = UrlList::model()->findAll();
 		foreach($urlList as $item){
 			$model = new PageRank;
@@ -192,10 +195,11 @@ class Spider{
 			$model->score = 1;
 			$model->save();
 		}
+
 		echo 'Start iteration'.$this->br;
 		$db =  Yii::app()->db;
 		for($i=1; $i<=$iterations; $i++){
-			echo '#'.$i.$this->br;
+			echo 'iter. #'.$i.$this->br;
 			foreach($urlList as $item){
 				$pr = 0.15;
 				$links = Link::model()->findAllByAttributes(['toId'=>$item->id]);
@@ -209,5 +213,6 @@ class Spider{
 				$db->createCommand()->update('{{page_rank}}', array('score'=>$pr), 'urlId = :urlId', array(':urlId'=>$item->id));
 			}
 		}
+		echo 'PageRank calculate end.'.$this->br;
 	}
 }
