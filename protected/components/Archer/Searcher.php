@@ -57,13 +57,16 @@ class Searcher {
 	private function getScoredList($rows, $wordIds){
 		$totalScores = [];
 
-		/** FIXED::Сюда функцию ранжирования*/
+		$algo = [
+			$this->locationScore($rows),
+			$this->pagerankScore($rows),
+		];
 		if( count($wordIds) >= 2 )
-			$weights = $this->distanceScore($rows);
+			$algo[] = $this->distanceScore($rows);
 		else
-			$weights = $this->locationScore($rows);
-		/** Метрика по частоте дает самый плохой результат */
-		//$weights = $this->frequencyScore($rows);
+			$algo[] = $this->frequencyScore($rows);
+
+		$weights = $this->getWeight( $algo );
 
 		foreach($weights as $weight => $scores)
 			$totalScores[] = [ $weight, $scores ];
@@ -197,5 +200,22 @@ class Searcher {
 			}
 		}
 		return $list;
+	}
+
+	private function getWeight($arr){
+		$list = [];
+		foreach($arr as $metric => $results){
+			foreach( $results as $position ){
+				if (!isset($list[$position[0]]))
+					$list[ $position[ 0 ] ] = $position[1];
+				else
+					$list[ $position[ 0 ] ] += $position[1];
+			}
+		}
+		$results = [];
+		$max = max( $list );
+		asort ( $list );
+		foreach($list as $key => $score) $results[] = [ $key, (float)$score/$max ];
+		return $results;
 	}
 }
