@@ -5,7 +5,7 @@ class m140623_062114_add_nn_tables extends CDbMigration {
 	public function up(){
 		$this->createTable('{{node_hd}}',
 			[	'id' => 'pk',
-				'create_key' => 'integer(10) NOT NULL'
+				'create_key' => 'varchar(255) NOT NULL'
 			]);
 		$this->createTable('{{word_hd}}',
 			[	'id' => 'pk',
