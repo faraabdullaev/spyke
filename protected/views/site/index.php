@@ -17,3 +17,15 @@
 	<?php echo CHtml::submitButton('Search'); ?>
 
 <?php $this->endWidget(); ?>
+
+<?php
+	if($results != null){
+		foreach( $results as $position ){
+			echo number_format($position['score'], 5);
+			echo '&nbsp;&nbsp;&nbsp;&nbsp;';
+			echo $position['url'];
+			//echo CHtml::link($position['url'], $position['url']);
+			echo '<br>';
+		}
+	}
+?>

@@ -16,22 +16,19 @@ class SiteController extends Controller {
 
 	public function actionIndex(){
 		$model = new QueryForm;
-
+		$results = null;
 		if( isset($_POST['QueryForm']) ){
 			$model->attributes = $_POST['QueryForm'];
 			$searcher = new Searcher();
-			$result = $searcher->Query( $model->query );
-
-			/*
-			foreach( $result['positions'] as $position ){
-				var_dump($position);
-				echo '<br>';
-			}
-			*/
+			$results = $searcher->Query( $model->query );
 		}
-
 		//$q = 'Бесплатные игры онлайн';
-		$this->render('index', ['model'=>$model]);
+		$this->render('index',
+			[
+				'model'	=> $model,
+				'results' => $results
+			]
+		);
 	}
 
 	/**

@@ -92,10 +92,12 @@ class Searcher {
 				];
 		}
 
+		/**
 		foreach( $rankedScores as $position ){
 			var_dump( $position ); echo '<br>';
 		}
-
+		*/
+		return $rankedScores;
 	}
 
 	private function normalize($rows, $smallIsBetter = true){
