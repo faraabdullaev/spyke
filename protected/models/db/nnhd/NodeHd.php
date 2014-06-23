@@ -5,7 +5,7 @@
  *
  * The followings are the available columns in table '{{node_hd}}':
  * @property integer $id
- * @property integer $create_key
+ * @property string $create_key
  */
 class NodeHd extends CActiveRecord
 {
@@ -26,7 +26,7 @@ class NodeHd extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('create_key', 'required'),
-			array('create_key', 'numerical', 'integerOnly'=>true),
+			array('create_key', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, create_key', 'safe', 'on'=>'search'),
@@ -74,7 +74,7 @@ class NodeHd extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id);
-		$criteria->compare('create_key',$this->create_key);
+		$criteria->compare('create_key',$this->create_key,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

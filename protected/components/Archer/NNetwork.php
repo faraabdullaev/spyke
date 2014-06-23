@@ -36,6 +36,18 @@ class NNetwork {
 
 	function generateHiddenNode($wordIds, $urls){
 		if( count($wordIds) > 3 ) return null;
-		$createKey = implode('_', $wordIds);
+		$create_key = implode('_', $wordIds);
+		$result = NodeHd::model()->findByAttributes(['create_key'=>$create_key]);
+		if( !$result ){
+			$result = new NodeHd;
+			$result->create_key = $create_key;
+			$result->save();
+			$hdID = $result->getPrimaryKey();
+			$strength = 1.0/count($wordIds);
+			foreach($wordIds as $id)
+				$this->setStrength($id, $hdID, 0, $strength);
+			foreach($urls as $id)
+				$this->setStrength($hdID, $id, 1, 0.1);
+		}
 	}
 }
