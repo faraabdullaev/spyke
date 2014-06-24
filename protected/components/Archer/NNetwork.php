@@ -126,4 +126,40 @@ class NNetwork {
 		return $this->ao;
 	}
 
+	private function dtanh($x){
+		return 1.0-$x*$x;
+	}
+
+	function BackPropagade($targets, $N = 0.5){
+		/** Вычислить поправки для выходного сигнала */
+		$output_deltas = [];
+		for($i=0; $i<count($this->urlIds); $i++){
+			$error = $targets[$i] - $this->ao[$i];
+			$output_deltas[$i] = $this->dtanh($this->ao[$i]) * $error;
+		}
+		/** Вычислить поправки для скрытого сигнала */
+		$hidden_deltas = [];
+		for($j=0; $j<count($this->hiddenIds); $j++){
+			$error = 0.0;
+			for($i=0; $i<count($this->urlIds); $i++){
+				$error += $output_deltas[$i] * $this->wo[$j][$i];
+			}
+			$hidden_deltas[$j] = $this->dtanh($this->ah[$j]) * $error;
+		}
+		/** Обновления веса связей между узлами скрытого и выходного слоя */
+		for($j=0; $j<count($this->hiddenIds); $j++){
+			for($i=0; $i<count($this->urlIds); $i++){
+				$change = $output_deltas[$i] * $this->ah[$j];
+				$this->wo[$j][$i] += $N * $change;
+			}
+		}
+		/** Обновления веса связей между узлами входного и скрытого слоя */
+		for($i=0; $i<count($this->wordIds); $i++){
+			for($j=0; $j<count($this->hiddenIds); $j++){
+				$change = $hidden_deltas[$j] * $this->ai[$i];
+				$this->wi[$i][$j] += $N * $change;
+			}
+		}
+	}
+
 }
