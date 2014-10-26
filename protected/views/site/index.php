@@ -13,7 +13,6 @@
 )); ?>
 
 	<?php echo $form->textField($model,'query'); ?>
-
 	<?php echo CHtml::submitButton('Search'); ?>
 
 <?php $this->endWidget(); ?>
@@ -27,5 +26,6 @@
 			//echo CHtml::link($position['url'], $position['url']);
 			echo '<br>';
 		}
-	}
+	} else
+		echo 'No result';
 ?>

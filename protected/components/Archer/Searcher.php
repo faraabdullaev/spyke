@@ -14,28 +14,35 @@ class Searcher {
 		$tableList = '';
 		$clauseList = '';
 		$wordList = [];
-
+		$fullQuery = null;
 		$words = explode(' ', strtolower(trim($q)));
 		$tableNumber = 0;
-		foreach($words as $word){
-			if(empty($word)) continue;
+		if(count($words)==1){
+			$wordRow = WordList::model()->findByAttributes(array('word'=>$words[0]));
+			if( $wordRow )
+				$fullQuery = "SELECT w0.urlId, w0.location AS s1 FROM spk_word_location w0 WHERE w0.wordId = $wordRow->id";
+		} else {
+			foreach($words as $word){
+				if(empty($word)) continue;
 
-			$wordRow = WordList::model()->findByAttributes(array('word'=>$word));
-			if( $wordRow ){
-				$wordId = $wordRow->id;
-				$wordList[] = $wordId;
-				if( $tableNumber > 0 ){
-					$tableList .= ' , ';
-					$clauseList .= ' AND ';
-					$clauseList .= sprintf('w%s.urlId = w%s.urlId AND ', $tableNumber-1, $tableNumber);
+				$wordRow = WordList::model()->findByAttributes(array('word'=>$word));
+				if( $wordRow ){
+					$wordId = $wordRow->id;
+					$wordList[] = $wordId;
+					if( $tableNumber > 0 ){
+						$tableList .= ' , ';
+						$clauseList .= ' AND ';
+						$clauseList .= sprintf('w%s.urlId = w%s.urlId AND ', $tableNumber-1, $tableNumber);
+					}
+					$fieldList .= sprintf(', w%s.location  AS s%s', $tableNumber, $tableNumber);
+					$tableList .= sprintf('{{word_location}} w%s', $tableNumber);
+					$clauseList .= sprintf('w%s.wordId = %s ', $tableNumber, $wordId);
+					$tableNumber++;
 				}
-				$fieldList .= sprintf(', w%s.location  AS s%s', $tableNumber, $tableNumber);
-				$tableList .= sprintf('{{word_location}} w%s', $tableNumber);
-				$clauseList .= sprintf('w%s.wordId = %s ', $tableNumber, $wordId);
-				$tableNumber++;
 			}
+			$fullQuery = sprintf('SELECT %s FROM %s WHERE %s GROUP BY w0.urlId', $fieldList, $tableList, $clauseList);
 		}
-		$fullQuery = sprintf('SELECT %s FROM %s WHERE %s GROUP BY w0.urlId', $fieldList, $tableList, $clauseList);
+		if(!$fullQuery) return;
 		$command = Yii::app()->db->createCommand($fullQuery);
 		$positions = $command->queryAll();
 
@@ -76,6 +83,7 @@ class Searcher {
 
 	function Query($q){
 		$result = $this->getMatchRows($q);
+		if(!$result) return;
 		$rows = $result['positions'];
 		$wordList = $result['wordList'];
 

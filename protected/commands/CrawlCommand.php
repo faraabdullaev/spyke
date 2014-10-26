@@ -17,7 +17,6 @@ class CrawlCommand extends CConsoleCommand{
 
 	public function actionPagerank(){
 		$spider = Spider::getInstance();
-
 		$spider->calculatePageRank();
 	}
 }
