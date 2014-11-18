@@ -19,8 +19,10 @@ class Searcher {
 		$tableNumber = 0;
 		if(count($words)==1){
 			$wordRow = WordList::model()->findByAttributes(array('word'=>$words[0]));
+			$wordId = $wordRow->id;
+			$wordList[] = $wordId;
 			if( $wordRow )
-				$fullQuery = "SELECT w0.urlId, w0.location AS s1 FROM spk_word_location w0 WHERE w0.wordId = $wordRow->id";
+				$fullQuery = "SELECT w0.urlId, w0.location AS s1 FROM spk_word_location w0 WHERE w0.wordId = $wordId";
 		} else {
 			foreach($words as $word){
 				if(empty($word)) continue;
@@ -221,7 +223,7 @@ class Searcher {
 		}
 		$results = [];
 		$max = max( $list );
-		asort ( $list );
+		asort( $list );
 		foreach($list as $key => $score) $results[] = [ $key, (float)$score/$max ];
 		return $results;
 	}
