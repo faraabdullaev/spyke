@@ -3,7 +3,7 @@
 class Searcher {
 
 	private $ignoreList = null;
-
+	private $_words = null;
 	function __construct(){
 		$this->ignoreList = require_once('IgnoreWords.php');
 	}
@@ -50,7 +50,7 @@ class Searcher {
 			'positions'	=> $positions,
 			'wordList'	=> $wordList
 		];
-
+		$this->_words = $wordList;
 		return $result;
 	}
 
@@ -64,6 +64,7 @@ class Searcher {
 	private function getScoredList($rows, $wordIds){
 		$totalScores = [];
 
+		/*
 		$algo = [
 			$this->locationScore($rows),
 			$this->pagerankScore($rows),
@@ -72,6 +73,9 @@ class Searcher {
 			$algo[] = $this->distanceScore($rows);
 		else
 			$algo[] = $this->frequencyScore($rows);
+		*/
+		$algo = [];
+		$algo[] = $this->frequencyScore($rows);
 
 		$weights = $this->getWeight( $algo );
 
@@ -134,25 +138,18 @@ class Searcher {
 	}
 
 	private function frequencyScore($rows){
-		$count = 1;
-		$i = 0;
 		$counts = [];
-		$lastUrl = '';
 		foreach($rows as $row){
-			if($lastUrl == $row['urlId']){
-				$count++;
-				$counts[$i-1][1] = $count;
-			} else {
-				$counts[$i] = [
-					$row['urlId'],
-					$count
-				];
-				$i++;
-				$count = 1;
+			$sum = 0;
+			foreach($this->_words as $word){
+				$sum += WordLocation::model()->count("wordId = $word AND urlId = ".$row['urlId']);
 			}
-			$lastUrl = $row['urlId'];
+			$counts[] = [
+				$row['urlId'],
+				$sum
+			];
 		}
-		return $this->normalize($counts);
+		return $this->normalize($counts, false);
 	}
 
 	private function locationScore($rows){
