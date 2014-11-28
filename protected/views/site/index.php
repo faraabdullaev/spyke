@@ -19,13 +19,16 @@
 
 <?php
 	if($results != null){
+		$i = 0;
 		foreach( $results as $position ){
+			$i++;
 			echo number_format($position['score'], 5);
 			echo '&nbsp;&nbsp;&nbsp;&nbsp;';
 			echo $position['url'];
 			//echo CHtml::link($position['url'], $position['url']);
 			echo '<br>';
 		}
+		echo 'Total: '.$i;
 	} else
 		echo 'No result';
 ?>

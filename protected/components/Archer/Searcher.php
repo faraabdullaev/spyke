@@ -19,6 +19,7 @@ class Searcher {
 		$tableNumber = 0;
 		if(count($words)==1){
 			$wordRow = WordList::model()->findByAttributes(array('word'=>$words[0]));
+			if(!$wordRow) return;
 			$wordId = $wordRow->id;
 			$wordList[] = $wordId;
 			if( $wordRow )
@@ -77,7 +78,7 @@ class Searcher {
 			$algo[] = $this->frequencyScore($rows);
 		*/
 		$algo = [];
-		$algo[] = $this->frequencyScore($rows);
+		$algo[] = $this->distanceScore($rows);
 
 		$weights = $this->getWeight( $algo );
 
@@ -105,16 +106,11 @@ class Searcher {
 					'url'	=> $score[0]
 				];
 		}
-
-		/**
-		foreach( $rankedScores as $position ){
-			var_dump( $position ); echo '<br>';
-		}
-		*/
 		return $rankedScores;
 	}
 
 	private function normalize($rows, $smallIsBetter = true){
+		if(!$rows) return;
 		$vsmall = 0.0001;
 		$scoresValues = $this->getScoresValues($rows);
 		$list = [];
