@@ -12,8 +12,9 @@
 	),
 )); ?>
 
-	<?php echo $form->textField($model,'query', ['style'=>'width: 360px']); ?>
+	<?php echo $form->textField($model,'query'); ?>
 	<?php echo CHtml::submitButton('Search'); ?>
+	<?php echo $form->error($model,'query'); ?>
 	<br>
 	<span>Method :</span>
 	<?php echo $form->radioButtonList($model,'method',
@@ -26,6 +27,7 @@
 			['separator'=>' ']
 		);
 	?>
+	<?php echo $form->error($model,'method'); ?>
 	<br>
 	<br>
 

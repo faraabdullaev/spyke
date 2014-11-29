@@ -6,7 +6,7 @@ class QueryForm extends CFormModel{
 
 	public function rules(){
 		return [
-			['query', 'required'],
+			['query, method', 'required'],
 			['query', 'length', 'max'=>255, 'min'=>3],
 			['method', 'numerical', 'integerOnly'=>true],
 		];
@@ -14,7 +14,7 @@ class QueryForm extends CFormModel{
 
 	public function attributeLabels(){
 		return [
-			'query'=>Yii::t('main', 'Ur query'),
+			'query'=>Yii::t('main', 'Query row'),
 			'method'=>Yii::t('main', 'Range method'),
 		];
 	}
