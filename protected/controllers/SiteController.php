@@ -8,7 +8,7 @@ class SiteController extends Controller {
 		if( isset($_POST['QueryForm']) ){
 			$model->attributes = $_POST['QueryForm'];
 			$searcher = new Searcher();
-			$results = $searcher->Query( $model->query );
+			$results = $searcher->Query( $model->query, $model->method );
 		}
 		$this->render('index',
 			[

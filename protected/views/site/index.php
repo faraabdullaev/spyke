@@ -12,8 +12,22 @@
 	),
 )); ?>
 
-	<?php echo $form->textField($model,'query'); ?>
+	<?php echo $form->textField($model,'query', ['style'=>'width: 360px']); ?>
 	<?php echo CHtml::submitButton('Search'); ?>
+	<br>
+	<span>Method :</span>
+	<?php echo $form->radioButtonList($model,'method',
+			[
+				1 => 'Location',
+				2 => 'Distance',
+				3 => 'Frequency',
+				4 => 'Page Rank',
+			],
+			['separator'=>' ']
+		);
+	?>
+	<br>
+	<br>
 
 <?php $this->endWidget(); ?>
 

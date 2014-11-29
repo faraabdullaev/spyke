@@ -64,9 +64,23 @@ class Searcher {
 		return false;
 	}
 
-	private function getScoredList($rows, $wordIds){
+	private function getScoredList($rows, $wordIds, $method){
 		$totalScores = [];
 
+		$algo = [];
+		switch($method){
+			case 1:
+				$algo[] = $this->locationScore($rows);
+				break;
+			case 1:
+				$algo[] = $this->distanceScore($rows);
+				break;
+			case 1:
+				$algo[] = $this->frequencyScore($rows);
+				break;
+			default:
+				$algo[] = $this->pagerankScore($rows);
+		}
 		/*
 		$algo = [
 			$this->locationScore($rows),
@@ -76,9 +90,10 @@ class Searcher {
 			$algo[] = $this->distanceScore($rows);
 		else
 			$algo[] = $this->frequencyScore($rows);
-		*/
+
 		$algo = [];
-		$algo[] = $this->distanceScore($rows);
+		$algo[] = $this->pagerankScore($rows);
+		*/
 
 		$weights = $this->getWeight( $algo );
 
@@ -88,13 +103,13 @@ class Searcher {
 		return $totalScores;
 	}
 
-	function Query($q){
-		$result = $this->getMatchRows($q);
+	function Query($query, $method){
+		$result = $this->getMatchRows($query);
 		if(!$result) return;
 		$rows = $result['positions'];
 		$wordList = $result['wordList'];
 
-		$scores = $this->getScoredList($rows, $wordList);
+		$scores = $this->getScoredList($rows, $wordList, $method);
 		for($i=0; $i<count($scores); $i++){
 			$scores[$i][0] = $this->getUrlName($scores[$i][1][0]);
 		}
