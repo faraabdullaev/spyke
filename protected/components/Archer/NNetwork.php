@@ -29,8 +29,7 @@ class NNetwork {
 		$model = $this->getStrengthModel($layer);
 		$result = $model->findByAttributes([ 'fromId' => $fromId, 'toId' => $toId ]);
 		if( !$result ) {
-			if($layer == 0) $model = new WordHd;
-			else $model = new UrlHd;
+			$model = $this->setStrengthModel($layer);
 			$model->fromId = $fromId;
 			$model->toId = $toId;
 		}
@@ -39,8 +38,11 @@ class NNetwork {
 	}
 
 	private function getStrengthModel($layer){
-		if($layer == 0) return WordHd::model();
-		else return UrlHd::model();
+		$layer == 0 ? return WordHd::model() : return UrlHd::model();
+	}
+
+	private function setStrengthModel($layer){
+		$layer == 0 ? return new WordHd : return new UrlHd;
 	}
 
 	function generateHiddenNode($wordIds, $urls){
