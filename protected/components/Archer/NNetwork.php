@@ -82,10 +82,6 @@ class NNetwork {
 		$this->urlIds = $urlIds;
 		$this->hiddenIds = $this->getAllHiddenIds($wordIds, $urlIds);
 
-		//$this->ai = 1.0*count($this->wordIds);
-		//$this->ah = 1.0*count($this->hiddenIds);
-		//$this->ao = 1.0*count($this->urlIds);
-
 		/** Создаем матрицу весов */
 		$i = 0;
 		$j = $i;
