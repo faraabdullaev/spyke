@@ -81,20 +81,6 @@ class Searcher {
 			default:
 				$algo[] = $this->pagerankScore($rows);
 		}
-		/*
-		$algo = [
-			$this->locationScore($rows),
-			$this->pagerankScore($rows),
-		];
-		if( count($wordIds) >= 2 )
-			$algo[] = $this->distanceScore($rows);
-		else
-			$algo[] = $this->frequencyScore($rows);
-
-		$algo = [];
-		$algo[] = $this->pagerankScore($rows);
-		*/
-
 		$weights = $this->getWeight( $algo );
 
 		foreach($weights as $weight => $scores)
