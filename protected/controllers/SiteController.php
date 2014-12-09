@@ -20,8 +20,7 @@ class SiteController extends Controller {
 		);
 	}
 
-	public function actionError()
-	{
+	public function actionError(){
 		if($error=Yii::app()->errorHandler->error)
 		{
 			if(Yii::app()->request->isAjaxRequest)
@@ -29,6 +28,18 @@ class SiteController extends Controller {
 			else
 				$this->render('error', $error);
 		}
+	}
+
+	public function actionNeyronnetwork(){
+		$dump = [
+			'WIds'	=> [ 6766, 5139 ],
+			'UIds'	=> [ 906, 1413, 591, 1308 ]
+		];
+		$nn = new NNetwork();
+		//$nn->generateHiddenNode($dump['WIds'], $dump['UIds']);
+		$nn->setupNetwork($dump['WIds'], $dump['UIds']);
+		$res = $nn->FeedForward();
+		var_dump( $res );
 	}
 
 }

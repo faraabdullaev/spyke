@@ -38,11 +38,13 @@ class NNetwork {
 	}
 
 	private function getStrengthModel($layer){
-		$layer == 0 ? return WordHd::model() : return UrlHd::model();
+		$layer == 0 ? $model = WordHd::model() : $model = UrlHd::model();
+		return $model;
 	}
 
 	private function setStrengthModel($layer){
-		$layer == 0 ? return new WordHd : return new UrlHd;
+		$layer == 0 ? $model = new WordHd : $model = new UrlHd;
+		return $model;
 	}
 
 	function generateHiddenNode($wordIds, $urls){
@@ -67,12 +69,12 @@ class NNetwork {
 		foreach( $worddIds as $id ){
 			$words = WordHd::model()->findAllByAttributes(['fromId'=>$id]);
 			foreach($words as $word)
-				$l1[ $word->toId ] = 1;
+				$l1[] = $word->toId;
 		}
 		foreach( $urlIds as $id){
 			$urls = UrlHd::model()->findAllByAttributes(['toId'=>$id]);
-			foreach($urlIds as $url)
-				$l1[ $url->fromId ] = 1;
+			foreach($urls as $url)
+				$l1[] = $url->fromId;
 		}
 		return array_keys($l1);
 	}
