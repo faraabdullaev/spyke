@@ -85,8 +85,7 @@ class NNetwork {
 		$this->hiddenIds = $this->getAllHiddenIds($wordIds, $urlIds);
 
 		/** Создаем матрицу весов */
-		$i = 0;
-		$j = $i;
+		$i = $j = 0;
 		foreach($this->wordIds as $wid){
 			foreach($this->hiddenIds as $hid){
 				$this->wi[$i][$j] = $this->getStrength($wid, $hid, 0);
@@ -95,6 +94,7 @@ class NNetwork {
 			$j = 0;
 			$i++;
 		}
+		$i = $j = 0;
 		foreach($this->hiddenIds as $hid){
 			foreach($this->urlIds as $uid){
 				$this->wo[$i][$j] = $this->getStrength($hid, $uid, 1);
