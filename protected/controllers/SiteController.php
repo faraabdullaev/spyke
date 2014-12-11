@@ -36,9 +36,9 @@ class SiteController extends Controller {
 			'UIds'	=> [ 906, 1413, 591, 1308 ]
 		];
 		$nn = new NNetwork();
-		//$nn->generateHiddenNode($dump['WIds'], $dump['UIds']);
-		$nn->setupNetwork($dump['WIds'], $dump['UIds']);
-		$res = $nn->FeedForward();
+
+		$res = $nn->trainQuery($dump['WIds'], $dump['UIds'], 1413);
+		$res = $nn->getResult($dump['WIds'], $dump['UIds']);
 		var_dump( $res );
 	}
 

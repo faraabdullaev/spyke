@@ -162,4 +162,42 @@ class NNetwork {
 		}
 	}
 
+	function trainQuery($wordIds, $urlIds, $selectedUrl){
+		/** Сгенерировать скрытый узел если необходимо */
+		$this->generateHiddenNode($wordIds, $urlIds);
+
+		$this->setupNetwork($wordIds, $urlIds);
+		$this->FeedForward();
+		$targets = [];
+		foreach($urlIds as $url)
+			$targets[] = (float)($url == $selectedUrl);
+		$error = $this->BackPropagade($targets);
+		$this->updateDB();
+	}
+
+	function updateDB(){
+		$i = $j = 0;
+		foreach($this->wordIds as $wid){
+			foreach($this->hiddenIds as $hid){
+				$this->setStrength($wid, $hid, 0, $this->wi[$i][$j]);
+				$j++;
+			}
+			$j = 0;
+			$i++;
+		}
+		$i = $j = 0;
+		foreach($this->hiddenIds as $hid){
+			foreach($this->urlIds as $uid){
+				$this->setStrength($hid, $uid, 1, $this->wo[$i][$j]);
+				$j++;
+			}
+			$j = 0;
+			$i++;
+		}
+	}
+
+	public function getResult($wordIds, $urlIds){
+		$this->setupNetwork($wordIds, $urlIds);
+		return $this->FeedForward();
+	}
 }
