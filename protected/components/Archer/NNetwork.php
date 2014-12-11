@@ -11,10 +11,10 @@ class NNetwork {
 	private $wi = [];
 	private $wo = [];
 
-	static private $NEYRON_NETWORK = null;
+	static private $NEURAL_NETWORK = null;
 	static public function getInstance(){
-		if(self::$NEYRON_NETWORK == null) self::$NEYRON_NETWORK = new NNetwork;
-		return self::$NEYRON_NETWORK;
+		if(self::$NEURAL_NETWORK == null) self::$NEURAL_NETWORK = new NNetwork;
+		return self::$NEURAL_NETWORK;
 	}
 	function __clone(){}
 	private function __construct(){
@@ -205,7 +205,6 @@ class NNetwork {
 			$results[ $urlIds[$i] ] = $res;
 			$i++;
 		}
-		arsort($results, 0);
 		return $results;
 	}
 }

@@ -19,6 +19,17 @@ class SiteController extends Controller {
 			]
 		);
 	}
+	public function actionSet($id){
+		$meta = Yii::app()->session->get('meta');
+		$nn = NNetwork::getInstance();
+		$nn->trainQuery($meta['WIds'], $meta['UIds'], $id);
+		$url = UrlList::model()->findByPk($id)->url;
+		$this->redirect($url);
+	}
+
+	public function getUrl($id){
+		return UrlList::model()->findByPk($id)->url;
+	}
 
 	public function actionError(){
 		if($error=Yii::app()->errorHandler->error)

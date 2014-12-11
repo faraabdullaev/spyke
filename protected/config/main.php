@@ -32,8 +32,7 @@ return array(
 			'urlFormat'=>'path',
 			'rules'=>array(
 				''					=> 'site/index',
-				'neyronnetwork'		=> 'neyron/index',
-				'set/<id:\d+>'		=> 'neyron/set',
+				'set/<id:\d+>'		=> 'site/set',
 
 				'<controller:\w+>/<id:\d+>'=>'<controller>/view',
 				'<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',

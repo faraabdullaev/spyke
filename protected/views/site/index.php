@@ -14,37 +14,53 @@
 
 	<?php echo $form->textField($model,'query'); ?>
 	<?php echo CHtml::submitButton('Search'); ?>
-	<?php echo $form->error($model,'query'); ?>
 	<br>
 	<span>Method :</span>
 	<?php echo $form->radioButtonList($model,'method',
 			[
-				1 => 'Location',
-				2 => 'Distance',
-				3 => 'Frequency',
-				4 => 'Page Rank',
+				QueryForm::METHOD_LOCATION			=> 'Location',
+				QueryForm::METHOD_DISTANCE			=> 'Distance',
+				QueryForm::METHOD_FREQUENCY			=> 'Frequency',
+				QueryForm::METHOD_PAGERANK			=> 'Page Rank',
+				QueryForm::METHOD_NEURAL_NETWORK	=> 'Neural Network',
 			],
 			['separator'=>' ']
 		);
 	?>
+	<?php echo $form->error($model,'query'); ?>
 	<?php echo $form->error($model,'method'); ?>
 	<br>
 	<br>
 
 <?php $this->endWidget(); ?>
 
-<?php
-	if($results != null){
-		$i = 0;
-		foreach( $results as $position ){
-			$i++;
-			echo number_format($position['score'], 5);
-			echo '&nbsp;&nbsp;&nbsp;&nbsp;';
-			echo $position['url'];
-			//echo CHtml::link($position['url'], $position['url']);
-			echo '<br>';
-		}
-		echo 'Total: '.$i;
-	} else
-		echo 'No result';
-?>
+<?php if($results != null): ?>
+	<table>
+		<thead>
+		<tr>
+			<th>Score</th>
+			<th>Url</th>
+		</tr>
+		</thead>
+		<tbody>
+		<?php foreach($results as $url => $score):?>
+			<tr>
+				<td>
+					<?php echo number_format($score, 5); ?>
+				</td>
+				<td>
+					<?php
+					echo CHtml::link(
+						$this->getUrl($url),
+						'/set/'.$url,
+						[
+							'target' => '_blank'
+						]
+					);
+					?>
+				</td>
+			</tr>
+		<?php endforeach;?>
+		</tbody>
+	</table>
+<?php endif; ?>

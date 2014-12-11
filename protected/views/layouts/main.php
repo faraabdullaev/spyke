@@ -10,7 +10,7 @@
 			background: rgb(240, 190, 190);
 		}
 		#QueryForm_query{
-			width: 360px;
+			width: 490px;
 		}
 	</style>
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>

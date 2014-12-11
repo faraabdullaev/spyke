@@ -1,6 +1,12 @@
 <?php
 
 class QueryForm extends CFormModel{
+	const METHOD_LOCATION		= 1;
+	const METHOD_DISTANCE		= 2;
+	const METHOD_FREQUENCY		= 3;
+	const METHOD_PAGERANK		= 4;
+	const METHOD_NEURAL_NETWORK	= 5;
+
 	public $query;
 	public $method;
 
