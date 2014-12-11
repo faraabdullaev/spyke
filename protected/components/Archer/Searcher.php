@@ -224,4 +224,13 @@ class Searcher {
 		foreach($list as $key => $score) $results[] = [ $key, (float)$score/$max ];
 		return $results;
 	}
+
+	public function getQueryResults($q){
+		$results = $this->getMatchRows($q);
+		$WIds = $results['wordList'];
+		$UIds = [];
+		foreach($results['positions'] as $pos)
+			$UIds[] = $pos['urlId'];
+		return [ 'WIds'=>$WIds, 'UIds'=>$UIds ];
+	}
 }

@@ -11,7 +11,13 @@ class NNetwork {
 	private $wi = [];
 	private $wo = [];
 
-	function __construct(){
+	static private $NEYRON_NETWORK = null;
+	static public function getInstance(){
+		if(self::$NEYRON_NETWORK == null) self::$NEYRON_NETWORK = new NNetwork;
+		return self::$NEYRON_NETWORK;
+	}
+	function __clone(){}
+	private function __construct(){
 		return true;
 	}
 
@@ -27,9 +33,9 @@ class NNetwork {
 
 	function setStrength($fromId, $toId, $layer, $strength){
 		$model = $this->getStrengthModel($layer);
-		$result = $model->findByAttributes([ 'fromId' => $fromId, 'toId' => $toId ]);
-		if( !$result ) {
-			$model = $this->setStrengthModel($layer);
+		$model = $model->findByAttributes([ 'fromId' => $fromId, 'toId' => $toId ]);
+		if( !$model ) {
+			$model = ($layer == 0) ? new WordHd : new UrlHd;
 			$model->fromId = $fromId;
 			$model->toId = $toId;
 		}
@@ -38,13 +44,7 @@ class NNetwork {
 	}
 
 	private function getStrengthModel($layer){
-		$layer == 0 ? $model = WordHd::model() : $model = UrlHd::model();
-		return $model;
-	}
-
-	private function setStrengthModel($layer){
-		$layer == 0 ? $model = new WordHd : $model = new UrlHd;
-		return $model;
+		return ($layer == 0) ? WordHd::model() : UrlHd::model();
 	}
 
 	function generateHiddenNode($wordIds, $urls){
@@ -69,12 +69,12 @@ class NNetwork {
 		foreach( $worddIds as $id ){
 			$words = WordHd::model()->findAllByAttributes(['fromId'=>$id]);
 			foreach($words as $word)
-				$l1[] = $word->toId;
+				$l1[ $word->toId ] = 1;
 		}
 		foreach( $urlIds as $id){
 			$urls = UrlHd::model()->findAllByAttributes(['toId'=>$id]);
 			foreach($urls as $url)
-				$l1[] = $url->fromId;
+				$l1[ $url->fromId ] = 1;
 		}
 		return array_keys($l1);
 	}
@@ -164,7 +164,7 @@ class NNetwork {
 
 	function trainQuery($wordIds, $urlIds, $selectedUrl){
 		/** Сгенерировать скрытый узел если необходимо */
-		$this->generateHiddenNode($wordIds, $urlIds);
+		//$this->generateHiddenNode($wordIds, $urlIds);
 
 		$this->setupNetwork($wordIds, $urlIds);
 		$this->FeedForward();
@@ -198,6 +198,14 @@ class NNetwork {
 
 	public function getResult($wordIds, $urlIds){
 		$this->setupNetwork($wordIds, $urlIds);
-		return $this->FeedForward();
+		$ff = $this->FeedForward();
+		$i = 0;
+		$results = [];
+		foreach($ff as $res){
+			$results[ $urlIds[$i] ] = $res;
+			$i++;
+		}
+		arsort($results, 0);
+		return $results;
 	}
 }

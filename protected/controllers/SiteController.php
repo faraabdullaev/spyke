@@ -8,7 +8,7 @@ class SiteController extends Controller {
 		if( isset($_POST['QueryForm']) ){
 			$model->attributes = $_POST['QueryForm'];
 			if($model->validate()){
-				$searcher = new Searcher();
+				$searcher = new Searcher;
 				$results = $searcher->Query( $model->query, $model->method );
 			}
 		}
@@ -28,18 +28,6 @@ class SiteController extends Controller {
 			else
 				$this->render('error', $error);
 		}
-	}
-
-	public function actionNeyronnetwork(){
-		$dump = [
-			'WIds'	=> [ 6766, 5139 ],
-			'UIds'	=> [ 906, 1413, 591, 1308 ]
-		];
-		$nn = new NNetwork();
-
-		$res = $nn->trainQuery($dump['WIds'], $dump['UIds'], 1413);
-		$res = $nn->getResult($dump['WIds'], $dump['UIds']);
-		var_dump( $res );
 	}
 
 }
