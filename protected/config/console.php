@@ -11,7 +11,6 @@ $config =  array(
 	'import'=>array(
 		'application.models.db.*',
 		'application.components.SpiderEngine.*',
-		'application.components.*',
 	),
 
 	'components'=>array(

@@ -2,10 +2,9 @@
 
 class Searcher {
 
-	private $ignoreList = null;
 	private $_words = null;
 	function __construct(){
-		$this->ignoreList = require_once('IgnoreWords.php');
+		return true;
 	}
 
 	private function getMatchRows($q){
@@ -49,22 +48,11 @@ class Searcher {
 		$command = Yii::app()->db->createCommand($fullQuery);
 		$positions = $command->queryAll();
 
-		$result = [
-			'positions'	=> $positions,
-			'wordList'	=> $wordList
-		];
 		$this->_words = $wordList;
-		return $result;
+		return [ 'positions'	=> $positions, 'wordList'	=> $wordList ];
 	}
 
-	private function getUrlName($id){
-		$model = UrlList::model()->findByPk($id);
-		if( $model )
-			return $model->url;
-		return false;
-	}
-
-	private function getScoredList($rows, $wordIds, $method){
+	private function calculateScores($rows, $wordIds, $method){
 		switch ($method){
 			case QueryForm::METHOD_LOCATION:
 				return $this->locationScore($rows);
@@ -79,10 +67,20 @@ class Searcher {
 		}
 	}
 
+	private function getQueryResults($q){
+		$results = $this->getMatchRows($q);
+		$WIds = $results['wordList'];
+		$UIds = [];
+		foreach($results['positions'] as $pos)
+			$UIds[] = $pos['urlId'];
+		Yii::app()->session->add('meta', ['WIds'=>$WIds, 'UIds'=>$UIds]);
+		return $results;
+	}
+
 	function Query($query, $method){
 		$result = $this->getQueryResults($query);
 		if(!$result) return;
-		return $this->getScoredList($result['positions'], $result['wordList'], $method);
+		return $this->calculateScores($result['positions'], $result['wordList'], $method);
 	}
 
 	private function normalize($rows, $smallIsBetter = true){
@@ -173,13 +171,4 @@ class Searcher {
 		return $this->normalize($pageranks);
 	}
 
-	public function getQueryResults($q){
-		$results = $this->getMatchRows($q);
-		$WIds = $results['wordList'];
-		$UIds = [];
-		foreach($results['positions'] as $pos)
-			$UIds[] = $pos['urlId'];
-		Yii::app()->session->add('meta', ['WIds'=>$WIds, 'UIds'=>$UIds]);
-		return $results;
-	}
 }

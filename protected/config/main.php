@@ -11,8 +11,7 @@ return array(
 		'application.models.db.nnhd.*',
 		'application.models.form.*',
 		'application.components.*',
-		'application.components.Archer.*',
-		'application.components.SpiderEngine.*',
+		'application.components.SearchEngine.*',
 	),
 
 	'modules'=>array(

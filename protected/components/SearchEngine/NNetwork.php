@@ -24,10 +24,8 @@ class NNetwork {
 	function getStrength($fromId, $toId, $layer){
 		$model = $this->getStrengthModel($layer);
 		$result = $model->findByAttributes([ 'fromId' => $fromId, 'toId' => $toId ]);
-		if( !$result ){
-			if($layer == 0) return -0.2;
-			else return 0;
-		}
+		if( !$result )
+			return ($layer == 0) ? -0.2 : 0.0;
 		return $result->strength;
 	}
 
@@ -48,7 +46,7 @@ class NNetwork {
 	}
 
 	function generateHiddenNode($wordIds, $urls){
-		if( count($wordIds) > 3 ) return null;
+		if( count($wordIds) > 5 ) return null;
 		$create_key = implode('_', $wordIds);
 		$result = NodeHd::model()->findByAttributes(['create_key'=>$create_key]);
 		if( !$result ){
@@ -164,14 +162,14 @@ class NNetwork {
 
 	function trainQuery($wordIds, $urlIds, $selectedUrl){
 		/** Сгенерировать скрытый узел если необходимо */
-		//$this->generateHiddenNode($wordIds, $urlIds);
+		$this->generateHiddenNode($wordIds, $urlIds);
 
 		$this->setupNetwork($wordIds, $urlIds);
 		$this->FeedForward();
 		$targets = [];
 		foreach($urlIds as $url)
 			$targets[] = (float)($url == $selectedUrl);
-		$error = $this->BackPropagade($targets);
+		$this->BackPropagade($targets);
 		$this->updateDB();
 	}
 
