@@ -2,6 +2,9 @@
 
 class NNetwork {
 
+	const TO_WORD_MODEL = 0;
+	const TO_URL_MODEL = 1;
+
 	private $wordIds;
 	private $urlIds;
 	private $hiddenIds;
@@ -25,15 +28,15 @@ class NNetwork {
 		$model = $this->getStrengthModel($layer);
 		$result = $model->findByAttributes([ 'fromId' => $fromId, 'toId' => $toId ]);
 		if( !$result )
-			return ($layer == 0) ? -0.2 : 0.0;
+			return ($layer == self::TO_WORD_MODEL) ? -0.2 : 0.0;
 		return $result->strength;
 	}
 
 	function setStrength($fromId, $toId, $layer, $strength){
 		$model = $this->getStrengthModel($layer);
 		$model = $model->findByAttributes([ 'fromId' => $fromId, 'toId' => $toId ]);
-		if( !$model ) {
-			$model = ($layer == 0) ? new WordHd : new UrlHd;
+		if(!$model) {
+			$model = ($layer == self::TO_WORD_MODEL) ? new WordHd : new UrlHd;
 			$model->fromId = $fromId;
 			$model->toId = $toId;
 		}
@@ -42,7 +45,7 @@ class NNetwork {
 	}
 
 	private function getStrengthModel($layer){
-		return ($layer == 0) ? WordHd::model() : UrlHd::model();
+		return ($layer == self::TO_WORD_MODEL) ? WordHd::model() : UrlHd::model();
 	}
 
 	function generateHiddenNode($wordIds, $urls){
@@ -56,15 +59,15 @@ class NNetwork {
 			$hdID = $result->getPrimaryKey();
 			$strength = 1.0/count($wordIds);
 			foreach($wordIds as $id)
-				$this->setStrength($id, $hdID, 0, $strength);
+				$this->setStrength($id, $hdID, self::TO_WORD_MODEL, $strength);
 			foreach($urls as $id)
-				$this->setStrength($hdID, $id, 1, 0.1);
+				$this->setStrength($hdID, $id, self::TO_URL_MODEL, 0.1);
 		}
 	}
 
-	function getAllHiddenIds($worddIds, $urlIds){
+	function getAllHiddenIds($wordIds, $urlIds){
 		$l1 = [];
-		foreach( $worddIds as $id ){
+		foreach( $wordIds as $id ){
 			$words = WordHd::model()->findAllByAttributes(['fromId'=>$id]);
 			foreach($words as $word)
 				$l1[ $word->toId ] = 1;
@@ -86,7 +89,7 @@ class NNetwork {
 		$i = $j = 0;
 		foreach($this->wordIds as $wid){
 			foreach($this->hiddenIds as $hid){
-				$this->wi[$i][$j] = $this->getStrength($wid, $hid, 0);
+				$this->wi[$i][$j] = $this->getStrength($wid, $hid, self::TO_WORD_MODEL);
 				$j++;
 			}
 			$j = 0;
@@ -95,7 +98,7 @@ class NNetwork {
 		$i = $j = 0;
 		foreach($this->hiddenIds as $hid){
 			foreach($this->urlIds as $uid){
-				$this->wo[$i][$j] = $this->getStrength($hid, $uid, 1);
+				$this->wo[$i][$j] = $this->getStrength($hid, $uid, self::TO_URL_MODEL);
 				$j++;
 			}
 			$j = 0;
@@ -108,17 +111,15 @@ class NNetwork {
 		/** Возбуждение скрытых узлов */
 		for($j=0; $j<count($this->hiddenIds); $j++){
 			$sum = 0.0;
-			for($i=0; $i<count($this->wordIds); $i++){
+			for($i=0; $i<count($this->wordIds); $i++)
 				$sum += $this->ai[$i] * $this->wi[$i][$j];
-			}
 			$this->ah[$j] = tanh($sum);
 		}
 		/** Возбуждение выходных узлов */
 		for($k=0; $k<count($this->urlIds); $k++){
 			$sum = 0.0;
-			for($j=0; $j<count($this->hiddenIds); $j++){
+			for($j=0; $j<count($this->hiddenIds); $j++)
 				$sum += $this->ah[$j] * $this->wo[$j][$k];
-			}
 			$this->ao[$k] = tanh($sum);
 		}
 		return $this->ao;
@@ -128,7 +129,7 @@ class NNetwork {
 		return 1.0-$x*$x;
 	}
 
-	function BackPropagade($targets, $N = 0.5){
+	function BackPropagate($targets, $N = 0.5){
 		/** Вычислить поправки для выходного сигнала */
 		$output_deltas = [];
 		for($i=0; $i<count($this->urlIds); $i++){
@@ -139,9 +140,8 @@ class NNetwork {
 		$hidden_deltas = [];
 		for($j=0; $j<count($this->hiddenIds); $j++){
 			$error = 0.0;
-			for($i=0; $i<count($this->urlIds); $i++){
+			for($i=0; $i<count($this->urlIds); $i++)
 				$error += $output_deltas[$i] * $this->wo[$j][$i];
-			}
 			$hidden_deltas[$j] = $this->dtanh($this->ah[$j]) * $error;
 		}
 		/** Обновления веса связей между узлами скрытого и выходного слоя */
@@ -169,7 +169,7 @@ class NNetwork {
 		$targets = [];
 		foreach($urlIds as $url)
 			$targets[] = (float)($url == $selectedUrl);
-		$this->BackPropagade($targets);
+		$this->BackPropagate($targets);
 		$this->updateDB();
 	}
 
@@ -177,7 +177,7 @@ class NNetwork {
 		$i = $j = 0;
 		foreach($this->wordIds as $wid){
 			foreach($this->hiddenIds as $hid){
-				$this->setStrength($wid, $hid, 0, $this->wi[$i][$j]);
+				$this->setStrength($wid, $hid, self::TO_WORD_MODEL, $this->wi[$i][$j]);
 				$j++;
 			}
 			$j = 0;
@@ -186,7 +186,7 @@ class NNetwork {
 		$i = $j = 0;
 		foreach($this->hiddenIds as $hid){
 			foreach($this->urlIds as $uid){
-				$this->setStrength($hid, $uid, 1, $this->wo[$i][$j]);
+				$this->setStrength($hid, $uid, self::TO_URL_MODEL, $this->wo[$i][$j]);
 				$j++;
 			}
 			$j = 0;
